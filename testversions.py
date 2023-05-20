@@ -3,25 +3,19 @@ import subprocess
 import sys
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python script.py <file_path>")
-        sys.exit(1)
-
-    file_path = sys.argv[1]  # Get the file path from the command-line argument
-    git_command = f"git log --pretty=format:%h -- {file_path}"
-    revisions = subprocess.check_output(git_command, shell=True, text=True).splitlines()
-
     # Save the current branch
     current_branch = subprocess.check_output("git branch --show-current", shell=True, text=True).strip()
 
     results = []
 
-    for revision in revisions:
+    print("Enter revisions separated by newlines (Ctrl+D to finish):")
+    for revision in sys.stdin:
+        revision = revision.strip()
         print(f"Processing revision {revision}")
         os.system(f"git checkout {revision}")
 
         ant_realclean = "ant realclean"
-        ant_jar = "ant jar"
+        ant_jar = "ant jar -Dno-checkstyle"
         ant_test = "ant test -Dtest.name=VectorTypeTest"
 
         realclean_result = os.system(ant_realclean)
